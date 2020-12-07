@@ -48,9 +48,6 @@ impl HyperBitBit {
             self.sketch2 = 0;
             self.lgn += 1;
         }
-
-        // println!("self.sketch1 is {:?}!", self.sketch1);
-        // println!("self.sketch2 is {:?}!", self.sketch2);
     }
 }
 #[cfg(test)]
@@ -59,28 +56,41 @@ mod tests {
 
     use super::HyperBitBit;
     use rand::distributions::Alphanumeric;
-    use rand::{Rng};
+    use rand::Rng;
+    use std::collections::HashSet;
 
     #[test]
-    fn test_increment_0() {
+    fn test_basic() {
         let mut h = HyperBitBit::new();
         assert_eq!(1351, h.cardinality());
-        let rng = rand::thread_rng();
 
         h.add(&String::from("xxx"));
         h.add(&String::from("yyy"));
-        for n in 1..=10000000 {
-            let s = rng.sample_iter(&Alphanumeric).take(10).collect::<String>();
+        assert_eq!(1351, h.cardinality());
+    }
+
+    #[test]
+    fn test_cardinality() {
+        let mut h = HyperBitBit::new();
+        let mut items = HashSet::new();
+
+        assert_eq!(1351, h.cardinality());
+
+        let rng = rand::thread_rng();
+        let maxn = 100000;
+        for n in 1..=maxn {
+            let s = rng.sample_iter(&Alphanumeric).take(3).collect::<String>();
+
             h.add(&s);
-            if n % 10000 == 0 {
-                let rel: f64 = (100.0 * (n - h.cardinality() as i64) as f64) / (n as f64);
-                println!(
-                    "cardinality {:?} expected {:?} rel {:?}",
-                    h.cardinality(),
-                    n,
-                    rel
-                );
-            }
+            items.insert(s);
         }
+        let expected: i64 = items.len() as i64;
+        let rel: f64 = (100.0 * (expected - h.cardinality() as i64) as f64) / (expected as f64);
+        println!(
+            "cardinality {:?} expected {:?} rel {:?}",
+            h.cardinality(),
+            items.len(),
+            rel
+        );
     }
 }
