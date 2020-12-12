@@ -1,7 +1,7 @@
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct HyperBitBit {
     lgn: u8,
     sketch1: u64,
@@ -50,6 +50,7 @@ impl HyperBitBit {
         }
     }
 }
+
 #[cfg(test)]
 mod tests {
     extern crate rand;
@@ -63,7 +64,6 @@ mod tests {
     fn test_basic() {
         let mut h = HyperBitBit::new();
         assert_eq!(1351, h.cardinality());
-
         h.add(&String::from("xxx"));
         h.add(&String::from("yyy"));
         assert_eq!(1351, h.cardinality());
@@ -77,20 +77,15 @@ mod tests {
         assert_eq!(1351, h.cardinality());
 
         let rng = rand::thread_rng();
-        let maxn = 100000;
-        for n in 1..=maxn {
-            let s = rng.sample_iter(&Alphanumeric).take(3).collect::<String>();
+        let maxn = 10000;
+        for _ in 1..=maxn {
+            let s = rng.sample_iter(&Alphanumeric).take(5).collect::<String>();
 
             h.add(&s);
             items.insert(s);
         }
         let expected: i64 = items.len() as i64;
         let rel: f64 = (100.0 * (expected - h.cardinality() as i64) as f64) / (expected as f64);
-        println!(
-            "cardinality {:?} expected {:?} rel {:?}",
-            h.cardinality(),
-            items.len(),
-            rel
-        );
+        assert!(rel < 10.0);
     }
 }
