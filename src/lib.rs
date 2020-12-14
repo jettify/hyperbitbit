@@ -1,7 +1,14 @@
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
+#[cfg(feature = "serde")]
+use serde_crate::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, Debug)]
+#[cfg_attr(
+    feature = "serde",
+    derive(Deserialize, Serialize),
+    serde(crate = "serde_crate")
+)]
 pub struct HyperBitBit {
     lgn: u8,
     sketch1: u64,
@@ -55,10 +62,10 @@ impl HyperBitBit {
 mod tests {
     extern crate rand;
 
-    use super::HyperBitBit;
     use rand::distributions::Alphanumeric;
-    use rand::Rng;
+    use rand::prelude::*;
     use std::collections::HashSet;
+    use super::HyperBitBit;
 
     #[test]
     fn test_basic() {
@@ -76,10 +83,10 @@ mod tests {
 
         assert_eq!(1351, h.cardinality());
 
-        let rng = rand::thread_rng();
+        let mut rng = StdRng::seed_from_u64(42);
         let maxn = 10000;
         for _ in 1..=maxn {
-            let s = rng.sample_iter(&Alphanumeric).take(5).collect::<String>();
+            let s = (&mut rng).sample_iter(&Alphanumeric).take(4).collect::<String>();
 
             h.add(&s);
             items.insert(s);
@@ -87,5 +94,19 @@ mod tests {
         let expected: i64 = items.len() as i64;
         let rel: f64 = (100.0 * (expected - h.cardinality() as i64) as f64) / (expected as f64);
         assert!(rel < 10.0);
+    }
+
+    #[cfg(feature = "serde")]
+    #[test]
+    fn test_serde() {
+        let mut h = HyperBitBit::new();
+        h.insert("foo");
+
+        let serialized_h = bincode::serialize(&h).unwrap();
+        let other_h: HyperBitBit = bincode::deserialize(&serialized_h).unwrap();
+
+        assert_eq!(h.cardinality(), other_h.cardinality());
+        assert_eq!(h.sketch1, other_h.sketch1);
+        assert_eq!(h.sketch2, other_h.sketch2);
     }
 }
