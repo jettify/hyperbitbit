@@ -1,25 +1,34 @@
 [package]
 name = "hyperbitbit"
-version = "0.0.1"
+version = "0.0.1-alpha.1"
 authors = ["Nikolay Novik <nickolainovik@gmail.com>"]
 edition = "2018"
 
 readme = "README.md"
 description = "Implementation of HyperBitBit data structure"
 
+exclude = [".github", ".gitignore"]
+
 homepage = "https://github.com/jettify/hyperbitbit"
 repository = "https://github.com/jettify/hyperbitbit.git"
 
-keywords = ["sampling", "statistics", "analytics"]
-categories = ["data-structures"]
+keywords = ["collections", "data-structures", "probabilistic"]
+categories = ["algorithms", "data-structures"]
 
 license = "Apache-2.0"
 
 [dependencies]
 
-[dev-dependencies]
-rand = "0.7.0"
+[dependencies.serde_crate]
+package = "serde"
+optional = true
+version = "1.0.103"
+default-features = false
+features = ["std", "derive"]
 
+
+[dev-dependencies]
+rand = "0.7.3"
 [profile.release]
 debug=true
 
