@@ -1,14 +1,14 @@
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
-#[cfg(feature = "serde")]
-use serde_crate::{Deserialize, Serialize};
+
+#[cfg(feature="serde_support")]
+extern crate serde;
+
+#[cfg(feature="serde_support")]
+use serde::{Serialize, Deserialize};
 
 #[derive(Clone, Copy, Debug)]
-#[cfg_attr(
-    feature = "serde",
-    derive(Deserialize, Serialize),
-    serde(crate = "serde_crate")
-)]
+#[cfg_attr(feature = "serde_support", derive(Serialize, Deserialize))]
 pub struct HyperBitBit {
     lgn: u8,
     sketch1: u64,
@@ -61,6 +61,7 @@ impl HyperBitBit {
 #[cfg(test)]
 mod tests {
     extern crate rand;
+    extern crate serde_json;
 
     use rand::distributions::Alphanumeric;
     use rand::prelude::*;
@@ -100,10 +101,10 @@ mod tests {
     #[test]
     fn test_serde() {
         let mut h = HyperBitBit::new();
-        h.insert("foo");
+        h.add(&String::from("xxx"));
 
-        let serialized_h = bincode::serialize(&h).unwrap();
-        let other_h: HyperBitBit = bincode::deserialize(&serialized_h).unwrap();
+        let serialized_h = serde_json::to_string(&h).unwrap();
+        let other_h: HyperBitBit = serde_json::from_str(&serialized_h).unwrap();
 
         assert_eq!(h.cardinality(), other_h.cardinality());
         assert_eq!(h.sketch1, other_h.sketch1);

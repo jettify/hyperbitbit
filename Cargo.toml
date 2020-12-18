@@ -19,7 +19,7 @@ license = "Apache-2.0"
 
 [dependencies]
 
-[dependencies.serde_crate]
+[dependencies.serde]
 package = "serde"
 optional = true
 version = "1.0.103"
@@ -27,8 +27,13 @@ default-features = false
 features = ["std", "derive"]
 
 
+[features]
+serde_support = ["serde"]
+
 [dev-dependencies]
 rand = "0.7.3"
+serde_json = "1.0.59"
+
 [profile.release]
 debug=true
 
