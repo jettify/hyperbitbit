@@ -40,7 +40,7 @@
 
  Create a HyperBitBit, add more data and estimate cardinality
 
- ```
+ ```rust
  use hyperbitbit::HyperBitBit;
  use rand::distributions::Alphanumeric;
  use rand::prelude::*;

@@ -1,3 +1,75 @@
+//! A native rust implementation of a HyperBitBit algorithm introduced by
+//! by Robert Sedgewick in [AC11-Cardinality.pdf](https://www.cs.princeton.edu/~rs/talks/AC11-Cardinality.pdf)
+//!
+//! # Feature
+//! * HyperBitBit, for N < 2^64
+//! * Uses 128 + 8 bit of space
+//! * Estimated cardinality withing 10% or actuals for large N.
+//!
+//! Consider HyperLogLog variants for productions usage, sine this data structure
+//! extensively studied, merge able and more accurate. HyperBitBit is extremely
+//! cheap and fast alternative in expense of accuracy.
+//!
+//! # Usage
+//!
+//! This crate is [on crates.io](https://crates.io/crates/hyperbitbit) and
+//! can be used by adding `hyperbitbit` to the dependencies in your
+//! project's `Cargo.toml`.
+//!
+//! ```toml
+//! [dependencies]
+//! hyperbitbit = "0.0.1-alpha.1"
+//! ```
+//! If you want [serde](https://github.com/serde-rs/serde) support, include the feature like this:
+//!
+//! ```toml
+//! [dependencies]
+//! hyperbitbit = { version = "0.0.1-alpha.1", features = ["serde_support"] }
+//! ```
+//!
+//! add this to your crate root:
+//!
+//! ```rust
+//! extern crate hyperbitbit;
+//! ```
+//!
+//! # Example
+//!
+//! Create a HyperBitBit, add more data and estimate cardinality
+//!
+//! ```rust
+//! use hyperbitbit::HyperBitBit;
+//! use rand::distributions::Alphanumeric;
+//! use rand::prelude::*;
+//! use std::collections::HashSet;
+//!
+//! fn main() {
+//!     // create hbb for cardinality estimation
+//!     let mut hbb = HyperBitBit::new();
+//!     // hash set to measure exact cardinality
+//!     let mut items = HashSet::new();
+//!     // fixed seed for RNG for reproducibly results
+//!     let mut rng = StdRng::seed_from_u64(42);
+//!     // put bunch of random strings on hbb and hash set for comparison
+//!     let maxn = 10000;
+//!     for _ in 1..maxn {
+//!         let s = (&mut rng).sample_iter(&Alphanumeric).take(4).collect::<String>();
+//!
+//!         hbb.add(&s);
+//!         items.insert(s);
+//!     }
+//!     let expected: i64 = items.len() as i64;
+//!     let rel: f64 = (100.0 * (expected - hbb.cardinality() as i64) as f64) / (expected as f64);
+//!
+//!     println!("Actuals cardinality:   {:?}", expected);
+//!     println!("Estimated cardinality: {:?}", hbb.cardinality());
+//!     println!("Error % cardinality:   {:.2}", rel);
+//! }
+//!```
+//! # Lincese
+//!  Licensed under the Apache License, Version 2.0
+
+
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
@@ -26,15 +98,39 @@ impl Default for HyperBitBit {
 }
 
 impl HyperBitBit {
+    /// create a new HyperBitBit struct
+    ///
+    /// # Example
+    /// ```
+    /// # use hyperbitbit::HyperBitBit;
+    /// let mut h = HyperBitBit::new();
+    /// ```
     pub fn new() -> HyperBitBit {
         Default::default()
     }
 
+    /// estimate cardinality
+    ///
+    /// # Example
+    /// ```
+    /// # use hyperbitbit::HyperBitBit;
+    /// let mut h = HyperBitBit::new();
+    /// h.add(&String::from("xxx"));
+    /// println!("{}", h.cardinality());
+    /// ```
     pub fn cardinality(&self) -> u64 {
         let exponent: f64 = self.lgn as f64 + 5.4 + (self.sketch1.count_ones() as f64) / 32.0;
         f64::powf(2.0, exponent) as u64
     }
 
+    /// add string HyperBitBit
+    ///
+    /// # Example
+    /// ```
+    /// # use hyperbitbit::HyperBitBit;
+    /// let mut h = HyperBitBit::new();
+    /// h.add(&String::from("xxx"));
+    /// ```
     pub fn add(&mut self, v: &str) {
         let mut hasher = DefaultHasher::new();
         v.hash(&mut hasher);
@@ -71,6 +167,7 @@ mod tests {
     #[test]
     fn test_basic() {
         let mut h = HyperBitBit::new();
+        // HyperBitBit is not working for small cardinalities
         assert_eq!(1351, h.cardinality());
         h.add(&String::from("xxx"));
         h.add(&String::from("yyy"));
@@ -109,5 +206,6 @@ mod tests {
         assert_eq!(h.cardinality(), other_h.cardinality());
         assert_eq!(h.sketch1, other_h.sketch1);
         assert_eq!(h.sketch2, other_h.sketch2);
+        assert_eq!(h.lgn, other_h.lgn);
     }
 }
