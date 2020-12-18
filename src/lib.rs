@@ -32,10 +32,10 @@ impl HyperBitBit {
 
     pub fn cardinality(&self) -> u64 {
         let exponent: f64 = self.lgn as f64 + 5.4 + (self.sketch1.count_ones() as f64) / 32.0;
-        return f64::powf(2.0, exponent) as u64;
+        f64::powf(2.0, exponent) as u64
     }
 
-    pub fn add(&mut self, v: &String) {
+    pub fn add(&mut self, v: &str) {
         let mut hasher = DefaultHasher::new();
         v.hash(&mut hasher);
         let hash_val: u64 = hasher.finish();
@@ -44,11 +44,11 @@ impl HyperBitBit {
         let r: u64 = ((hash_val >> 6).leading_zeros() - 6).into();
 
         if r > self.lgn.into() {
-            self.sketch1 = self.sketch1 | ((1 as u64) << k)
+            self.sketch1 |= 1_u64 << k
         }
 
         if r > (self.lgn + 1).into() {
-            self.sketch2 = self.sketch2 | ((1 as u64) << k)
+            self.sketch2 |= 1_u64 << k
         }
         if self.sketch1.count_ones() > 31 {
             self.sketch1 = self.sketch2;
