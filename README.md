@@ -1,5 +1,7 @@
 # HyperBitBit
 [![ci-badge](https://github.com/jettify/hyperbitbit/workflows/CI/badge.svg)](https://github.com/jettify/hyperbitbit/actions?query=workflow%3ACI)
+[![Crates.io](https://img.shields.io/crates/v/hyperbitbit.svg)](https://crates.io/crates/hyperbitbit)
+[![Documentation](https://docs.rs/hyperbitbit/badge.svg)](https://docs.rs/hyperbitbit/)
 
  A native rust implementation of a HyperBitBit algorithm introduced by
  by Robert Sedgewick in [AC11-Cardinality.pdf](https://www.cs.princeton.edu/~rs/talks/AC11-Cardinality.pdf)
