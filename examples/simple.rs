@@ -21,7 +21,7 @@ fn main() {
     let expected: i64 = items.len() as i64;
     let rel: f64 = (100.0 * (expected - hbb.cardinality() as i64) as f64) / (expected as f64);
 
-    println!("Actuals cordiality:   {:?}", expected);
-    println!("Estimated cordiality: {:?}", hbb.cardinality());
-    println!("Error % cordiality:   {:.2}", rel);
+    println!("Actuals cardinality:   {:?}", expected);
+    println!("Estimated cardinality: {:?}", hbb.cardinality());
+    println!("Error % cardinality:   {:.2}", rel);
 }
