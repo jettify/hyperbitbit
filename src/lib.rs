@@ -55,7 +55,7 @@
 //!     for _ in 1..maxn {
 //!         let s = (&mut rng).sample_iter(&Alphanumeric).take(4).collect::<String>();
 //!
-//!         hbb.add(&s);
+//!         hbb.insert(&s);
 //!         items.insert(s);
 //!     }
 //!     let expected: i64 = items.len() as i64;
@@ -115,7 +115,7 @@ impl HyperBitBit {
     /// ```
     /// # use hyperbitbit::HyperBitBit;
     /// let mut h = HyperBitBit::new();
-    /// h.add(&String::from("xxx"));
+    /// h.insert(&String::from("xxx"));
     /// println!("{}", h.cardinality());
     /// ```
     pub fn cardinality(&self) -> u64 {
@@ -123,15 +123,15 @@ impl HyperBitBit {
         f64::powf(2.0, exponent) as u64
     }
 
-    /// add string HyperBitBit
+    /// add string to HyperBitBit
     ///
     /// # Example
     /// ```
     /// # use hyperbitbit::HyperBitBit;
     /// let mut h = HyperBitBit::new();
-    /// h.add(&String::from("xxx"));
+    /// h.insert(&String::from("xxx"));
     /// ```
-    pub fn add(&mut self, v: &str) {
+    pub fn insert(&mut self, v: &str) {
         let mut hasher = DefaultHasher::new();
         v.hash(&mut hasher);
         let hash_val: u64 = hasher.finish();
@@ -169,8 +169,8 @@ mod tests {
         let mut h = HyperBitBit::new();
         // HyperBitBit is not working for small cardinalities
         assert_eq!(1351, h.cardinality());
-        h.add(&String::from("xxx"));
-        h.add(&String::from("yyy"));
+        h.insert(&String::from("xxx"));
+        h.insert(&String::from("yyy"));
         assert_eq!(1351, h.cardinality());
     }
 
@@ -186,7 +186,7 @@ mod tests {
         for _ in 1..=maxn {
             let s = (&mut rng).sample_iter(&Alphanumeric).take(4).collect::<String>();
 
-            h.add(&s);
+            h.insert(&s);
             items.insert(s);
         }
         let expected: i64 = items.len() as i64;
@@ -198,7 +198,7 @@ mod tests {
     #[test]
     fn test_serde() {
         let mut h = HyperBitBit::new();
-        h.add(&String::from("xxx"));
+        h.insert(&String::from("xxx"));
 
         let serialized_h = serde_json::to_string(&h).unwrap();
         let other_h: HyperBitBit = serde_json::from_str(&serialized_h).unwrap();
