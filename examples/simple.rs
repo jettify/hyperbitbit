@@ -15,7 +15,7 @@ fn main() {
     for _ in 1..maxn {
         let s = (&mut rng).sample_iter(&Alphanumeric).take(4).collect::<String>();
 
-        hbb.add(&s);
+        hbb.insert(&s);
         items.insert(s);
     }
     let expected: i64 = items.len() as i64;
