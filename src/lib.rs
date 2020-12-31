@@ -39,21 +39,21 @@
 //!
 //! ```rust
 //! use hyperbitbit::HyperBitBit;
+//! use rand::Rng;
+//! use rand::SeedableRng;
 //! use rand::distributions::Alphanumeric;
-//! use rand::prelude::*;
+//! use rand_isaac::Isaac64Rng;
 //! use std::collections::HashSet;
 //!
+//!
 //! fn main() {
-//!     // create hbb for cardinality estimation
 //!     let mut hbb = HyperBitBit::new();
-//!     // hash set to measure exact cardinality
 //!     let mut items = HashSet::new();
-//!     // fixed seed for RNG for reproducibly results
-//!     let mut rng = StdRng::seed_from_u64(42);
-//!     // put bunch of random strings on hbb and hash set for comparison
-//!     let maxn = 10000;
+//!     let mut rng = Isaac64Rng::seed_from_u64(42);
+//!
+//!     let maxn = 100000;
 //!     for _ in 1..maxn {
-//!         let s = (&mut rng).sample_iter(&Alphanumeric).take(4).collect::<String>();
+//!         let s = (&mut rng).sample_iter(&Alphanumeric).take(3).collect::<String>();
 //!
 //!         hbb.insert(&s);
 //!         items.insert(s);
@@ -61,7 +61,7 @@
 //!     let expected: i64 = items.len() as i64;
 //!     let rel: f64 = (100.0 * (expected - hbb.cardinality() as i64) as f64) / (expected as f64);
 //!
-//!     println!("Actuals cardinality:   {:?}", expected);
+//!     println!("Cardinality:           {:?}", expected);
 //!     println!("Estimated cardinality: {:?}", hbb.cardinality());
 //!     println!("Error % cardinality:   {:.2}", rel);
 //! }
@@ -160,7 +160,9 @@ mod tests {
     extern crate serde_json;
 
     use rand::distributions::Alphanumeric;
-    use rand::prelude::*;
+    use rand::Rng;
+    use rand::SeedableRng;
+    use rand_isaac::Isaac64Rng;
     use std::collections::HashSet;
     use super::HyperBitBit;
 
@@ -181,10 +183,10 @@ mod tests {
 
         assert_eq!(1351, h.cardinality());
 
-        let mut rng = StdRng::seed_from_u64(42);
+        let mut rng = Isaac64Rng::seed_from_u64(42);
         let maxn = 10000;
         for _ in 1..=maxn {
-            let s = (&mut rng).sample_iter(&Alphanumeric).take(4).collect::<String>();
+            let s = (&mut rng).sample_iter(&Alphanumeric).take(2).collect::<String>();
 
             h.insert(&s);
             items.insert(s);
